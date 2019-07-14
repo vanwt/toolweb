@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}
+    App 详细
+{% endblock %}
+{% block content %}
+
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-sm-10">
+            <h2></h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a>我的应用</a>
+                </li>
+            </ol>
+        </div>
+        <div class="col-sm-2">
+        </div>
+    </div>
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="ibox product-detail">
+                    <div class="ibox-content">
+
+                        <div class="row">
+                            <div class="col-md-5">
+
+
+                                <div class="product-images">
+                                    <div>
+                                        <div class="image">
+                                            {% if app.image_url %}
+                                                <img style="width: 100%;height: 100%;" src="/static/{{ app.image_url }}"
+                                                     alt="">
+                                            {% else %}
+                                                <img src="/static/img/admin.png" alt="">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-7">
+
+                                <h2 class="font-bold m-b-xs">
+                                    {{ app.name }}
+                                </h2>
+                                <div class="m-t-md">
+                                    {% for tag in app.categorys.all %}
+                                        <h2 class="product-main-price">标签:
+                                            <small class="text-muted">{{ tag }}</small>
+                                        </h2>
+                                    {% endfor %}
+                                </div>
+                                <hr>
+
+                                <h4>功能简介</h4>
+
+                                <div class="small text-muted">
+                                    {{ app.desc }}
+                                </div>
+                                <hr>
+
+                                <div>
+                                    <div class="btn-group">
+                                        <a class="btn btn-success btn-sm"
+                                           href="{% url 'change-view' %}?key={{ app.id }}"><i
+                                                class="fa fa-window-restore"></i>
+                                            编辑视图代码
+                                        </a>
+                                        <a class="btn btn-primary btn-sm"
+                                           href="{% url 'change-html' %}?key={{ app.id }}"><i
+                                                class="fa fa-html5"></i>
+                                            编辑HTML代码
+                                        </a>
+                                        <a class="btn btn-white btn-sm" href="/app/get/{{ app.id }}/">
+                                            <i class="fa fa-search"></i>查看</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="ibox-footer">
+                            <span class="pull-right">
+                                创建时间 - <i class="fa fa-clock-o"></i> {{ app.add_time }}
+                            </span>
+                        这是一些内容
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

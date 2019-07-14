@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}
+    App
+{% endblock %}
+{% block content %}
+
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-sm-12">
+            <h2></h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a>App</a>
+                </li>
+                <li class="active">
+                    <strong>{{ app_name }}</strong>
+                </li>
+            </ol>
+        </div>
+    </div>
+    <div class="wrapper wrapper-content">
+        <div class="row">
+            <div class="col-md-12">
+                {% autoescape off %}
+                    {{ html }}
+                {% endautoescape %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

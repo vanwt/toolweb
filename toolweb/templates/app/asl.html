@@ -1,0 +1,435 @@
+{% extends 'base.html' %}
+{% block title %}
+
+{% endblock %}
+{% block content %}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-sm-10">
+        <h2></h2>
+        <ol class="breadcrumb">
+            <li>
+                <a>资产管理</a>
+            </li>
+            <li class="active">
+                <strong>资产列表</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-sm-2">
+    </div>
+</div>
+<div class="wrapper wrapper-content">
+    <div class="alert alert-info help-message">
+        左侧是资产树，右侧是属于该节点下的资产，&ensp;导入数据请根据导出格式填入<span style="color: red">文本类型值</span>,填入其他均会导致导入数据与表格不符
+    </div>
+    <div class="row">
+        <div class="col-lg-2" id="split-left" style="padding-left: 3px;display: block">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content mailbox-content" style="padding-top: 0;padding-left: 1px">
+                    <div class="file-manager ">
+                        <div id="assetTree" class="ztree">
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-10 animated fadeInRight" id="split-right">
+            <div class="tree-toggle" style="display: block">
+                <div class="btn btn-sm btn-primary tree-toggle-btn" onclick="toggle()">
+                    <i class="fa fa-angle-left fa-x" id="toggle-icon"></i>
+                </div>
+            </div>
+            <div class="mail-box-header" style="width: 100%">
+                <div class="uc pull-left m-r-5" style="margin:0 10px 10px 0">
+                    <a href="/assets/create/" class="btn btn-sm btn-primary btn-create-asset">创建资产 </a>
+                </div>
+                <div class="uc pull-left m-r-5" style="margin:0 10px 10px 0">
+                    <a id="ImportAssets" class="btn btn-sm btn-warning btn-create-asset"> 导入 </a></div>
+                <div class="uc pull-left m-r-5" style="margin:0 10px 10px 0">
+                    <a href="{% url 'export-excel' %}" class="btn btn-sm btn-warning btn-create-asset"> 导出 </a></div>
+                <!--<div class="uc pull-left m-r-5" style="margin:-5px 0 10px 0"><a class="btn btn-sm btn-create-asset">-->
+                <!--<input type="search" class="form-control input-sm" placeholder=""-->
+                <!--aria-controls="asset_list_table"></a>-->
+                <!--</div>-->
+                <!--<div class="uc pull-left m-r-5" style="margin:0 10px 10px 0"><a-->
+                <!--class="btn btn-sm btn-success btn-create-asset"> 搜索 </a></div>-->
+                <table class="footable table toggle-arrow-tiny table-striped table-bordered "
+                       id="asset_list_table" style="width: 100%;" role="grid"
+                       aria-describedby="asset_list_table_info">
+                    <thead>
+                    <tr role="row">
+                        <th class="text-center sorting_disabled" rowspan="1" colspan="1"
+                            aria-label=""
+                            style="width: 5%;"><input type="checkbox" class="ipt_check_all"></th>
+                        <th class="text-center sorting" tabindex="0"
+                            aria-controls="asset_list_table"
+                            rowspan="1" colspan="1"
+                            aria-label="主机名: activate to sort column ascending"
+                            style="width: 10%;">资产类型
+                        </th>
+                        <th class="text-center sorting" tabindex="0"
+                            aria-controls="asset_list_table"
+                            rowspan="1" colspan="1"
+                            aria-label="IP: activate to sort column ascending"
+                            style="width: 10%">IP(点击检查磁盘)
+                        </th>
+                        <th class="text-center sorting" tabindex="0"
+                            aria-controls="asset_list_table"
+                            rowspan="1" colspan="1"
+                            aria-label="硬件: activate to sort column ascending"
+                            style="width: 10%">资产名
+                        </th>
+                        <th class="text-center sorting" tabindex="0"
+                            aria-controls="asset_list_table"
+                            rowspan="1" colspan="1"
+                            aria-label="硬件: activate to sort column ascending"
+                            style="width: 10%">资产编号
+                        </th>
+                        <th class="text-center sorting_disabled" rowspan="1" colspan="1"
+                            aria-label="激活中"
+                            style="width: 10%">激活
+                        </th>
+                        <th class="text-center sorting_disabled" rowspan="1" colspan="1"
+                            aria-label="激活中"
+                            style="width: 8%">状态
+                        </th>
+                        <th class="text-center sorting_disabled" rowspan="1" colspan="1"
+                            aria-label="动作"
+                            style="width: 24%">动作
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for assets in assets_list %}
+                    <tr role="row" class="odd">
+                        <td class=" text-center">
+                            <input type="checkbox" class="text-center ipt_check" id="change-assets">
+                        </td>
+                        <td class=" text-center">
+                            <a href="{% url 'assets-info' assets.id %}">
+                                {% if assets.asset_type == 'server' %}
+                                服务器设备
+                                {% elif assets.asset_type == 'networkdevice' %}
+                                网络设备
+                                {% elif assets.asset_type == 'securitydevice' %}
+                                安全设备
+                                {% elif assets.asset_type == 'software' %}
+                                软件
+                                {% endif %}
+                            </a>
+                        </td>
+                        <td class=" text-center">
+                            <button class="btn btn-xs btn-primary" style="width: 88%;" href="" onclick="showenv({{assets.id}})">
+                                {{assets.ip}}
+                            </button>
+                        </td>
+                        <td>
+                            {{ assets.name }}
+                        </td>
+                        <td>
+                            {{ assets.sn }}
+                        </td>
+                        <td class=" text-center">
+                            {% if assets.is_active %}
+                            已激活<i class="fa fa-check text-navy"></i>
+                            {% else %}
+                            未激活<i class="fa fa-eraser text-danger"></i>
+                            {% endif %}
+                        </td>
+                        <td class=" text-center">
+                            {% if assets.status == 0 %}
+                            下线
+                            {% elif assets.status == 1 %}
+                            已上线
+                            {% elif assets.status == 2 %}
+                            故障中
+                            {% elif assets.status == 3 %}
+                            未使用
+                            {% elif assets.status == 4 %}
+                            未知
+                            {% endif %}
+                        </td>
+                        <td class=" text-center">
+                            <a href="{% url 'assets-info' assets.id %}"
+                               class="btn btn-xs btn-default">详情</a>
+                            <a href="{% url 'assets-update' assets.sn %}"
+                               class="btn btn-xs btn-warning">修改</a>
+                            {% if assets.asset_type == 'server' %}
+                            <a class="btn btn-xs btn-info" onclick="hardware_update({{assets.id}})">信息收集</a>
+                            <a onclick="test_ping({{assets.id}},'{{assets.ip}}')"
+                               class="btn btn-xs btn-success">Ping</a>
+                            <a href="{% url 'ssh' assets.id %}" target="_blank"
+                               class="btn btn-primary btn-xs">
+                                <i class="fa fa-fw fa-terminal"></i></a>
+                            {% endif %}
+                            <button href="{% url 'assets-del' assets.sn %}"
+                                    class="btn btn-xs btn-danger m-l-xs btn_asset_delete" onclick="del({{assets.id}})">
+                                删除
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <div id="actions" class="hide">
+                    <div class="input-group">
+                        <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+                            <option value="delete">批量删除</option>
+                            <option value="update">批量更新</option>
+                            <option value="remove">从节点移除</option>
+                            <option value="deactive">禁用所选</option>
+                            <option value="active">激活所选</option>
+                        </select>
+                        <div class="input-group-btn pull-left" style="padding-left: 5px;">
+                            <button id='btn_bulk_update' style="height: 32px;" class="btn btn-sm btn-primary">
+                                提交
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade in" id="AssetModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true"
+     style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">Excel文件批量导入资产</h4>
+            </div>
+            <div style="margin-left: 10px;color: red">
+                <p>注意：</p>
+                <p>导入表格必须包含以下关键字段</p>
+                <p>资产类型,资产编号,资产名称,管理IP,设备状态,是否激活,制造商,购买日期,过保日期,合同,机房,项目,购买人,
+                    运维人员,运营人员,创建时间,<br>
+                    (服务器类型,主机名,ssh用户,ssh端口,ssh密码,mysql用户,mysql密码,不是服务器不填)</p>
+                <p>
+                <h3>详见导出的表格样式</h3></p>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'import-assets-excel'%}" enctype="multipart/form-data" method="post">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">上传文件</label>
+                        <div class="col-sm-6">
+                            {% csrf_token %}
+                            <input type="file" name="import_assets" placeholder="上传excel文件"
+                                   accept="text/csv,application/vnd.ms-excel" required="">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="btn-close" data-dismiss="modal">关闭
+                        </button>
+                        <button type="submit" class="btn btn-primary">导入
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<div class="modal fade in" id="server_disk" style="display: none;margin-top: 260px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" id="close_disk" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">磁盘挂载检查</h4>
+            </div>
+            <div style="margin-left: 10px;color: red">
+            </div>
+            <div class="modal-body">
+
+                <div class="form-group">
+
+                    <div class="col-sm-6" style="width: 100%">
+                        <pre style="background-color: #0c0c0c">
+                            <b id="code-ans">></b>
+                        </pre>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <button type="submit" id="close_disk2" class="btn btn-primary">关闭</button>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    var zTree, rMenu, asset_table, show = 0, datas = '';
+    $(document).ready(function () {
+        // 生成左侧资产树
+        var setting = {
+            view: {
+                showLine: false
+            },
+            // callback:{
+            //     onClick:zTreeOnClick
+            // }
+        };
+        $.get("{% url 'asset-ztree'%}", function (data) {
+            zTree = $.fn.zTree.init($("#assetTree"), setting, data);
+        }, 'json');
+        // database 表格插件
+        asset_table = $('#asset_list_table').DataTable();
+    })
+</script>
+<script>
+    // 导入表格显示与隐藏
+    $("#ImportAssets").click(function () {
+        $("#AssetModal").css('display', 'block')
+    });
+    $('[class="close"]').click(function () {
+        $("#AssetModal").css('display', 'none')
+    });
+    $('#btn-close').click(function () {
+        $("#AssetModal").css('display', 'none')
+    });
+
+    // 隐藏与显示左侧资产树
+    function toggle() {
+        if (show === 0) {
+            $("#split-left").hide(400, function () {
+                $("#split-right").attr("class", "col-lg-12");
+                $("#toggle-icon").attr("class", "fa fa-angle-right fa-x");
+                show = 1;
+            });
+        } else {
+            $("#split-right").attr("class", "col-lg-10");
+            $("#toggle-icon").attr("class", "fa fa-angle-left fa-x");
+            $("#split-left").show(400);
+            show = 0;
+        }
+    }
+
+    function hardware_update(id = null) {
+        if (id) {
+            $.get(
+                "/assets/hardware-update/" + id + "/",
+                {},
+                function (data) {
+                    if (data === "ok") {
+                        swal({title: "收集信息", text: "收集成功", type: "success"}, function () {
+//                             window.location.reload();
+                        })
+                    } else {
+                        swal({title: "收集信息", text: "收集失败", type: "error"}, function () {
+//                             window.location.reload();
+                        })
+                    }
+                }
+            )
+        }
+    }
+
+    function test_ping(id = null, ip = null) {
+        if (id === null) {
+            return null
+        }
+        let url = '/assets/test-ping/' + id + '/';
+        $.get(
+            url, {}, function (data) {
+                if (data == 'ok') {
+                    swal({title: "连接测试", text: "连接测试", type: "success"}, function () {
+//                             window.location.reload();
+                    })
+                } else {
+                    swal({title: "连接测试", text: "连接失败", type: "error"}, function () {
+//                             window.location.reload();
+                    })
+                }
+            }
+        )
+    }
+</script>
+<script type="text/javascript">
+    function del(id) {
+
+        swal({
+            title: "你确定删除",
+            text: "你将无法恢复",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            closeOnConfirm: false
+        }, function () {
+            $.ajax({
+                headers: {"X-CSRFToken": '{{ csrf_token }}'},
+                url: "/assets/list/",
+                type: 'DELETE',
+                data: {'id': id},
+                success: function (data) {
+                    var obj = JSON.parse(data);
+                    if (obj.status) {
+                        swal({title: "删除", text: "已成功删除", type: "success"}, function () {
+                            window.location.reload();
+                        })
+                    } else {
+                        swal("错误", "删除" + "[ " + obj.error + " ]" + "遇到错误", "error");
+                    }
+                },
+                error: function () {
+                    swal({title: "删除失败", text: "没有权限", type: "error"}, function () {
+                        window.location.reload();
+                    })
+                }
+            });
+        });
+    };
+</script>
+<script>
+    // 检测磁盘挂载
+    $('#close_disk').click(function () {
+        $("#server_disk").css('display', 'none')
+    });
+    $('#close_disk2').click(function () {
+        $("#server_disk").css('display', 'none')
+    });
+    function showenv(id) {
+        $('#server_disk').css('display','block');
+        let csrf = $('[name="csrfmiddlewaretoken"]').val();
+        //发送
+        $('#code-ans').html("<code style='color: white'>开始执行>></code>");
+        $.post(
+            '/assets/show-env/' + id + '/',
+            {
+                "csrfmiddlewaretoken": csrf,
+                "id": id,
+            },
+            function (data) {
+//                        alert(data.result)
+                // 回调函数
+                if (data.code === 200) {
+                    let result = data.result;
+                    let html = "<code style='color: white'>开始执行>></code>";
+                    html += '<code style=\"color: #008000\">';
+                    html += result;
+                    html += '</code>';
+                    html += "<code style='color: white'>执行完毕....</code>";
+                    $('#code-ans').html(html)
+
+                } else if (data.code === 500) {
+                    let result = data.result;
+                    alert('执行失败，服务器不可达或参数错误！');
+                    let html = '<code style=\"color: red\">' + result + '</code>';
+                    $('#code-ans').html(html)
+                }
+            }, 'json'
+        );
+
+    }
+</script>
+{% endblock %}

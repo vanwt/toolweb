@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>
+        {% block title %}首页{% endblock %}
+    </title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/plugins/sweetalert/sweetalert.css">
+    <!-- Toastr style -->
+    <link href="/static/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+
+    <!-- Gritter -->
+    <link href="/static/js/plugins/gritter/jquery.gritter.css" rel="stylesheet">
+
+    <link href="/static/css/animate.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    {% block css %}
+    {% endblock %}
+</head>
+
+<body>
+{#{% include 'left_nav.html' %}#}
+{% comment %}引入导航栏{% endcomment %}
+<div id="wrapper">
+    <div id="page-wrapper" class="gray-bg dashbard-1">
+        <div class="row border-bottom">
+            <!-- 顶部导航栏 -->
+            <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+                <!-- 顶部导航栏 -- 左侧 -->
+                <div class="navbar-header">
+                    <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i>
+                    </a>
+                    <form role="search" class="navbar-form-custom" style="display: none">
+                        <div class="form-group">
+                            <input type="text" placeholder="请输入搜索内容..." class="form-control"
+                                   name="top-search" id="top-search">
+                        </div>
+                    </form>
+                </div>
+                <!-- 顶部导航栏  -- 右侧 -->
+                <ul class="nav navbar-top-links navbar-right">
+                    <li>
+                        <a href="/">首页</a>
+                    </li>
+                    {% if request.user.is_authenticated %}
+                        <li>
+                            <a data-toggle="dropdown" class="dropdown-toggle" href="#" aria-expanded="false">
+                                <span class="m-r-sm text-muted welcome-message">
+                                    <img alt="image" class="img-circle" width="30" height="30"
+                                         src="/static/img/admin.png">
+                                    <span style="font-size: 13px;font-weight: 400"> {{ request.user.username | capfirst }}
+                                        <b class="caret"></b>
+                                    </span>
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu animated fadeInRight m-t-xs profile-dropdown">
+                                <li><a href="{% url  'get-my-apps' %}"><i class="fa fa-cogs"> </i><span> 个人信息</span></a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><a href="{% url 'create-app' %}">编写app</a></li>
+                        <li><a href="">我的app</a></li>
+                        <li>
+                            <a href="">
+                                <i class="fa fa-sign-out"></i> 退出登录
+                            </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="/accounts/login/">登录</a>
+                        </li>
+                    {% endif %}
+                    <li>关于本站</li>
+                </ul>
+
+            </nav>
+        </div>
+        {% block content %}
+
+        {% endblock %}
+    </div>
+
+    <!-- 右侧工具栏 -->
+    <div id="right-sidebar" class="animated">
+        <div class="sidebar-container">
+            <ul class="nav nav-tabs navs-3">
+                <li class="active"><a data-toggle="tab" href="#tab-1">
+                    最近通知
+                </a></li>
+                <li><a data-toggle="tab" href="#tab-2">
+                    项目
+                </a></li>
+                <li class=""><a data-toggle="tab" href="#tab-3">
+                    <i class="fa fa-gear"></i>
+                </a></li>
+            </ul>
+
+            <div class="tab-content">
+
+
+                <div id="tab-1" class="tab-pane active">
+
+                    <div class="sidebar-title">
+                        <h3><i class="fa fa-comments-o"></i> 最近通知</h3>
+                        <small><i class="fa fa-tim"></i>没有通知</small>
+                    </div>
+                    <div>
+                        <div class="sidebar-message">
+                            <a href="#">
+                                <div class="pull-left text-center">
+                                    <img alt="image" class="img-circle message-avatar" src="/static/img/a3.jpg">
+
+                                    <div class="m-t-xs">
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                    </div>
+                                </div>
+                                <div class="media-body">
+                                    Mevolved over the years, sometimes by accident, sometimes on purpose (injected
+                                    humour and the like).
+                                    <br>
+                                    <small class="text-muted">Yesterday 1:10 pm</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="tab-2" class="tab-pane">
+
+                    <div class="sidebar-title">
+                        <h3><i class="fa fa-cube"></i> 项目概览</h3>
+                        <small><i class="fa fa-tim"></i>你有N个项目</small>
+                    </div>
+                    <ul class="sidebar-list">
+                        <li>
+                            <a href="#">
+                                <div class="small pull-right m-t-xs">9 hours ago</div>
+                                <h4>Business valuation</h4>
+                                It is a long established fact that a reader will be distracted.
+
+                                <div class="small">Completion with: 22%</div>
+                                <div class="progress progress-mini">
+                                    <div style="width: 22%;" class="progress-bar progress-bar-warning"></div>
+                                </div>
+                                <div class="small text-muted m-t-xs">Project end: 4:00 pm - 12.06.2014</div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <div class="small pull-right m-t-xs">9 hours ago</div>
+                                <h4>Contract with Company </h4>
+                                Many desktop publishing packages and web page editors.
+
+                                <div class="small">Completion with: 48%</div>
+                                <div class="progress progress-mini">
+                                    <div style="width: 48%;" class="progress-bar"></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="label label-primary pull-right">NEW</span>
+                                <h4>The generated</h4>
+                                There are many variations of passages of Lorem Ipsum available.
+                                <div class="small">Completion with: 22%</div>
+                                <div class="small text-muted m-t-xs">Project end: 4:00 pm - 12.06.2014</div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="tab-3" class="tab-pane">
+
+                    <div class="sidebar-title">
+                        <h3><i class="fa fa-gears"></i> 常规设置</h3>
+                        <small><i class="fa fa-tim"></i> 简单的配置</small>
+                    </div>
+                    <div class="setings-item">
+                    <span>
+                       显示通知
+                    </span>
+                        <div class="switch">
+                            <div class="onoffswitch">
+                                <input type="checkbox" name="collapsemenu" class="onoffswitch-checkbox" id="example">
+                                <label class="onoffswitch-label" for="example">
+                                    <span class="onoffswitch-inner"></span>
+                                    <span class="onoffswitch-switch"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sidebar-content">
+                        <h4>设置</h4>
+                        <div class="small">
+                            简单概括--测试测试测试测试
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 基本的脚本 -->
+<script src="/static/js/jquery-3.1.1.min.js"></script>
+<script src="/static/js/bootstrap-select.js"></script>
+
+<script src="/static/js/plugins/sweetalert/sweetalert.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="/static/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+<!-- Flot -->
+<script src="/static/js/plugins/flot/jquery.flot.js"></script>
+<script src="/static/js/plugins/flot/jquery.flot.tooltip.min.js"></script>
+<script src="/static/js/plugins/flot/jquery.flot.spline.js"></script>
+<script src="/static/js/plugins/flot/jquery.flot.resize.js"></script>
+<script src="/static/js/plugins/flot/jquery.flot.pie.js"></script>
+
+
+<!-- Custom and plugin javascript -->
+<script src="/static/js/inspinia.js"></script>
+<script src="/static/js/plugins/pace/pace.min.js"></script>
+
+<!-- jQuery UI -->
+<script src="/static/js/plugins/jquery-ui/jquery-ui.min.js"></script>
+
+<!-- Sparkline -->
+<script src="/static/js/plugins/sparkline/jquery.sparkline.min.js"></script>
+
+<!-- Sparkline demo data  -->
+<script src="/static/js/demo/sparkline-demo.js"></script>
+
+{% block script %}
+{% endblock %}
+</body>
+</html>

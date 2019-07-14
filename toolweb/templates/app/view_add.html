@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}
+    VIEW在线编辑
+{% endblock %}
+{% block content %}
+
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-sm-12">
+            <h2></h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a>App信息</a>
+                </li>
+                <li class="active">
+                    <strong>VIEW在线编辑</strong>
+                </li>
+            </ol>
+        </div>
+    </div>
+    <div class="wrapper wrapper-content">
+        <div class="alert alert-info help-message">
+            VIEW 可以是一个函数，也可以是一个类（必须是可以调用的）
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="mail-box-header" style="width: 100%">
+                    <div class="list-group">
+                        <button class="btn btn-info btn-sm" onclick="javascript:history.back()">返回</button>
+                        <button class="btn btn-primary btn-sm" onclick="upload_html()">提交代码</button>
+                        <button class="btn btn-warning btn-sm">预览代码</button>
+                        <button class="btn btn-danger btn-sm">代码还原</button>
+                    </div>
+                    <div id="editor" style="height: 800px;">{{ content }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.4/ace.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script>
+        // 生成ace 编辑器
+        ace.require("ace/ext/language_tools");
+        var editor = ace.edit("editor");
+        editor.setOptions({
+            //enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true,//智能补全
+        });
+        editor.setTheme("ace/theme/monokai");//monokai模式是自动显示补全提示
+        //https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.4/keybinding-sublime.js
+        editor.getSession().setMode("ace/mode/python");//语言
+        editor.setFontSize(16);
+    </script>
+    <script>
+        function upload_html() {
+            swal({
+                title: "上传",
+                text: "你确定上传吗",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                closeOnConfirm: false
+            }, function () {
+                $.ajax({
+                    headers: {"X-CSRFToken": '{{ csrf_token }}'},
+                    url: "/app/change-view/",
+                    type: 'POST',
+                    data: {
+                        'key': "{{ id }}",
+                        "content": editor.session.getValue()
+                    },
+                    success: function (rdata) {
+                        if (rdata.code === 200) {
+                            swal({title: "成功", text: "代码上传成功", type: "success"}, function () {
+                                //window.location.href = "/app/info/" + rdata.data + "/"
+                                window.location.reload();
+                            })
+                        } else {
+                            swal({title: "错误", text: "上传失败", type: "error"});
+                        }
+                    },
+                    error: function () {
+                        swal({title: "失败", text: "未知错误，请稍后再试", type: "error"})
+                    }
+                });
+            });
+        }
+    </script>
+{% endblock %}

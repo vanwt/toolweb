@@ -1,0 +1,10 @@
+def result(data):
+    """
+    Required interface
+    The return value is your custom data and is then encapsulated into a Json string (automatic)
+    The json data format that is automatically encapsulated is as follows:
+    {"code":200,"data":{your params},"error":{error info}}
+    code 200/400/403/500， default 200
+    In other words, you only need to fill in the data parameter.
+    """
+    return None
